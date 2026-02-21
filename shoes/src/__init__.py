@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from src.shoes.routes import shoe_router
 from contextlib import asynccontextmanager
 from src.db.main import init_db 
+from src.auth.routes import auth_router
 
 
 version='v1'
@@ -11,6 +12,7 @@ async def life_span(app:FastAPI):
     await init_db()
     yield
     print(f"server stopped")
+    
 app=FastAPI(
     title="shoe_collecton",
     description="a rest api for shoe collection app",
@@ -20,3 +22,4 @@ app=FastAPI(
 )
 
 app.include_router(shoe_router,prefix=f"/api/{version}/shoes",tags=['shoes'])
+app.include_router(auth_router,prefix=f"/api/{version}/auth",tags=['auth'])
