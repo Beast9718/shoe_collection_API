@@ -16,7 +16,7 @@ async def life_span(app:FastAPI):
 app=FastAPI(
     title="shoe_collecton",
     description="a rest api for shoe collection app",
-    lifespan=life_span,
+    
 
     version= version
 )
