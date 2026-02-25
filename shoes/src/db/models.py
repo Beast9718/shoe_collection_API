@@ -27,6 +27,7 @@ class User(SQLModel,table=True):
     password_hash : str =Field(exclude=True)
     created_at : datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
     updated_at : datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
+    shoes:List["Shoe"]=Relationship(back_populates="user",sa_relationship_kwargs={'lazy':'selectin'})
     reviews:List["Review"]=Relationship(back_populates="user",sa_relationship_kwargs={'lazy':'selectin'})
 
     def __repr__(self):
@@ -39,7 +40,7 @@ class User(SQLModel,table=True):
 
 
 
-class shoe(SQLModel,table=True):
+class Shoe(SQLModel,table=True):
         __tablename__="shoes"
         uid: uuid.UUID=Field(
                 sa_column=Column(
@@ -60,11 +61,11 @@ class shoe(SQLModel,table=True):
         created_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
         updated_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
         user:Optional[User]=Relationship(back_populates="shoes")
-        reviews:List["Review"]=Relationship(back_populates="shoes",sa_relationship_kwargs={'lazy':'selectin'})
+        reviews:List["Review"]=Relationship(back_populates="shoe",sa_relationship_kwargs={'lazy':'selectin'})
 
 
         def __repr__(self):
-                return f"<shoe name= {self.name}>"
+                return f"<Shoe name= {self.name}>"
         
 
 class Review(SQLModel,table=True):
@@ -85,7 +86,7 @@ class Review(SQLModel,table=True):
         created_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
         updated_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
         user:Optional[User]=Relationship(back_populates="reviews")
-        shoe:Optional[shoe]=Relationship(back_populates="reviews")
+        shoe:Optional[Shoe]=Relationship(back_populates="reviews")
 
 
         def __repr__(self):

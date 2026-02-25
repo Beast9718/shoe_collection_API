@@ -6,7 +6,7 @@ from datetime import datetime,date
 
 
 
-class shoe(BaseModel):
+class Shoe(BaseModel):
         uid: uuid.UUID
         name: str
         company: str

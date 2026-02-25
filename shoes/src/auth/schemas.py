@@ -1,7 +1,7 @@
 from pydantic import BaseModel,Field
 import uuid 
 from datetime import datetime
-from src.shoes.schemas import shoe
+from src.shoes.schemas import Shoe
 from typing import List
 
 class UserCreateModel(BaseModel):
@@ -24,7 +24,7 @@ class UserModel(BaseModel):
     updated_at : datetime
 
 class UserShoesModel(UserModel):
-    shoes:List[shoe]
+    shoes:List[Shoe]
 
 class UserLoginModel(BaseModel):
     email:str=Field(max_length=30)

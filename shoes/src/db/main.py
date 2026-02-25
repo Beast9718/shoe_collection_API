@@ -12,7 +12,7 @@ async_engine=AsyncEngine(
 
 async def init_db():
     async with async_engine.begin() as connection:
-        from src.db.models import shoe
+        from src.db.models import Shoe
         await connection.run_sync(SQLModel.metadata.create_all)
 
 async def get_session() -> AsyncSession:
