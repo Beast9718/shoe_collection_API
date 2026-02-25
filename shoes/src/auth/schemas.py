@@ -1,6 +1,9 @@
 from pydantic import BaseModel,Field
 import uuid 
 from datetime import datetime
+from src.shoes.schemas import shoe
+from typing import List
+
 class UserCreateModel(BaseModel):
     first_name:str=Field(max_length=20)
     last_name:str=Field(max_length=20)
@@ -19,6 +22,9 @@ class UserModel(BaseModel):
     password_hash : str 
     created_at : datetime
     updated_at : datetime
+
+class UserShoesModel(UserModel):
+    shoes:List[shoe]
 
 class UserLoginModel(BaseModel):
     email:str=Field(max_length=30)

@@ -1,0 +1,33 @@
+# from sqlmodel import SQLModel,Field,Column,Relationship
+# import uuid
+# from datetime import datetime,date
+# import sqlalchemy.dialects.postgresql as pg
+# from typing import Optional
+# from src.auth import models
+
+
+# class shoe(SQLModel,table=True):
+#         __tablename__="shoes"
+#         uid: uuid.UUID=Field(
+#                 sa_column=Column(
+#                         pg.UUID,
+#                         nullable=False,
+#                         primary_key=True,
+#                         default=uuid.uuid4
+                    
+#                 )
+#         )
+#         name: str
+#         company: str
+#         category: str
+#         price: float
+#         published_at: date
+#         stock: int
+#         user_uid:Optional[uuid.UUID]=Field(default=None,foreign_key="user.uid")
+#         created_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
+#         updated_at:datetime=Field(sa_column=Column(pg.TIMESTAMP,default=datetime.now))
+#         user:Optional["models.User"]=Relationship(back_populates="shoes")
+
+
+#         def __repr__(self):
+#                 return f"<shoe name= {self.name}>"

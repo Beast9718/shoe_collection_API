@@ -1,5 +1,5 @@
 from fastapi import APIRouter,Depends,status
-from .schemas import UserCreateModel,UserModel,UserLoginModel
+from .schemas import UserCreateModel,UserModel,UserLoginModel,UserShoesModel
 from .service import UserService
 from src.db.main import get_session 
 from sqlmodel.ext.asyncio.session import AsyncSession
@@ -14,7 +14,7 @@ from src.db.redis import add_jti_to_blocklist
 auth_router=APIRouter()
 user_service=UserService()
 REFRESH_EXPIRY_TOKEN=2
-role_checker=Depends(RoleChecker(allowed_roles=["admin","user"]))
+role_checker=Depends(RoleChecker(["admin","user"]))
 
 @auth_router.post(
         '/signup',
@@ -89,7 +89,7 @@ async def get_new_access_token(token_details:dict=Depends(RefreshTokenBearer()))
         })
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,detail="Invalid or Expired token")
 
-@auth_router.get('/me',dependencies={role_checker})
+@auth_router.get('/me',response_model=UserShoesModel,dependencies=[role_checker])
 async def get_current_user(user=Depends(get_current_user)):
     return user
 

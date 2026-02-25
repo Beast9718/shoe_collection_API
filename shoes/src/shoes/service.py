@@ -1,7 +1,7 @@
 from sqlmodel.ext.asyncio.session import AsyncSession
 from .schemas import shoe_create_model,shoe_update_model
 from sqlmodel import select,desc
-from .models import shoe
+from src.db.models import shoe
 from datetime import datetime
 
 
@@ -10,20 +10,29 @@ class Shoe_Service:
         statement=select(shoe).order_by(desc(shoe.created_at))
         result=await session.exec(statement)
         return result.all()
+    
+    async def get_user_shoes(self,user_uid:str,session:AsyncSession):
+        statement=select(shoe).where(shoe.user_uid==user_uid).order_by(desc(shoe.created_at))
+        result=await session.exec(statement)
+        return result.all()
+    
     async def get_shoe(self,shoe_uid:str,session:AsyncSession):
         statement=select(shoe).where(shoe.uid == shoe_uid)
         result=await session.exec(statement)
         Shoe= result.first()
         return Shoe if Shoe is not None else None
     
-    async def create_shoe(self,shoe_data:shoe_create_model,session:AsyncSession):
+    async def create_shoe(self,shoe_data:shoe_create_model,user_uid:str,session:AsyncSession):
         shoe_data_dictionarie=shoe_data.model_dump()
         new_shoe=shoe(
             **shoe_data_dictionarie
         )
+        new_shoe.user_uid=user_uid
+        
         # new_shoe.published_at=datetime.strptime(shoe_data_dictionarie['published_at'],"%Y-%m-%d")
         session.add(new_shoe)
         await session.commit()
+        
         return new_shoe
     async def update_shoe(self,shoe_uid:str,update_data:shoe_update_model,session:AsyncSession):
         shoe_to_update=await self.get_shoe(shoe_uid,session)
