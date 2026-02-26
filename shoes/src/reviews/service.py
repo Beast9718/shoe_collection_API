@@ -5,17 +5,34 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from .schemas import ReviewCreateModel
 from fastapi.exceptions import HTTPException
 from fastapi import status
+import logging
 
 user_service=UserService()
 shoe_service=Shoe_Service()
 
 
 class ReviewService:
-    async def add_review_to_book(user_email:str,shoe_uid:str,review_data:ReviewCreateModel,session:AsyncSession):
+    async def add_review_to_shoe(self,user_email:str,shoe_uid:str,review_data:ReviewCreateModel,session:AsyncSession):
         try:
             shoe=await shoe_service.get_shoe(shoe_uid=shoe_uid,session=session)
             user=await user_service.get_user_by_email(email=user_email,session=session)
+            review_data_dict=review_data.model_dump()
+            new_review=Review(
+                **review_data_dict
+            )
+            if not shoe:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="shoe not found")
+            if not user:
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
+            new_review.user=user
+            new_review.shoe=shoe
+
+            session.add(new_review)
+            await session.commit()
+
+            return new_review
 
         except  Exception as e:
+            logging.exception(e)
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,detail="oops.. chudi lg gyi")
 

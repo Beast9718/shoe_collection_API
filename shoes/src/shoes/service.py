@@ -19,8 +19,8 @@ class Shoe_Service:
     async def get_shoe(self,shoe_uid:str,session:AsyncSession):
         statement=select(Shoe).where(Shoe.uid == shoe_uid)
         result=await session.exec(statement)
-        Shoe= result.first()
-        return Shoe if Shoe is not None else None
+        shoe= result.first()
+        return shoe if shoe is not None else None
     
     async def create_shoe(self,shoe_data:shoe_create_model,user_uid:str,session:AsyncSession):
         shoe_data_dictionarie=shoe_data.model_dump()
