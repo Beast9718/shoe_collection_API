@@ -1,7 +1,8 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional,List
 import uuid
 from datetime import datetime,date
+from src.reviews.schemas import ReviewModel
 
 
 
@@ -16,6 +17,9 @@ class Shoe(BaseModel):
         stock: int
         created_at:datetime
         updated_at:datetime
+
+class ShoeDetailModel(Shoe):
+        reviews:List[ReviewModel]
         
 
 

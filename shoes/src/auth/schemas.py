@@ -3,6 +3,7 @@ import uuid
 from datetime import datetime
 from src.shoes.schemas import Shoe
 from typing import List
+from src.reviews.schemas import ReviewModel
 
 class UserCreateModel(BaseModel):
     first_name:str=Field(max_length=20)
@@ -25,6 +26,8 @@ class UserModel(BaseModel):
 
 class UserShoesModel(UserModel):
     shoes:List[Shoe]
+    reviews:List[ReviewModel]
+    
 
 class UserLoginModel(BaseModel):
     email:str=Field(max_length=30)

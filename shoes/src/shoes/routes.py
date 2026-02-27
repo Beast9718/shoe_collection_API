@@ -1,10 +1,10 @@
 from fastapi import APIRouter,HTTPException,status,Depends
-from src.shoes.schemas import Shoe, shoe_update_model,shoe_create_model
+from .schemas import Shoe, shoe_update_model,shoe_create_model,ShoeDetailModel
 
 from typing import List
 from src.db.main import get_session
 from sqlmodel.ext.asyncio.session import AsyncSession
-from src.shoes.service import Shoe_Service
+from .service import Shoe_Service
 from src.auth.dependencies import AccessTokenBearer , RoleChecker
 
 shoe_router=APIRouter()
@@ -35,7 +35,7 @@ async def create_a_shoe(shoe_data:shoe_create_model,session:AsyncSession=Depends
       
       return new_shoe
 
-@shoe_router.get("/{shoe_uid}",response_model=Shoe,dependencies=[role_checker])
+@shoe_router.get("/{shoe_uid}",response_model=ShoeDetailModel,dependencies=[role_checker])
 async def get_shoe_from_id(shoe_uid:str,session:AsyncSession=Depends(get_session),token_details:dict=Depends(access_token_bearer)) -> dict:
     Shoe=await shoe_service.get_shoe(shoe_uid,session)
     if Shoe:
