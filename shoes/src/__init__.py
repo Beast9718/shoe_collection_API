@@ -5,6 +5,8 @@ from src.db.main import init_db
 from src.auth.routes import auth_router
 from src.reviews.routes import review_router
 
+from .middleware import register_middleware
+
 
 version='v1'
 @asynccontextmanager
@@ -21,6 +23,8 @@ app=FastAPI(
 
     version= version
 )
+
+register_middleware(app)
 
 app.include_router(shoe_router,prefix=f"/api/{version}/shoes",tags=['shoes'])
 app.include_router(auth_router,prefix=f"/api/{version}/auth",tags=['auth'])
