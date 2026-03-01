@@ -71,6 +71,12 @@ class RoleChecker:
         self.allowed_roles=allowed_roles
 
     def __call__(self, current_user:User=Depends(get_current_user))->any:
+        if not current_user.is_verified:
+            raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Account not verified"
+            )   
+        
         if current_user.role in self.allowed_roles:
             return True
         raise HTTPException(
