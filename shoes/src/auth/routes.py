@@ -11,6 +11,7 @@ from .dependencies import RefreshTokenBearer,AccessTokenBearer,get_current_user,
 from src.db.redis import add_jti_to_blocklist
 from src.mail import mail,create_message
 from src.config import Config
+from src.celery_tasks import send_email
 
 
 auth_router=APIRouter()
@@ -24,8 +25,7 @@ async def send_mail(emails:EmailModel):
     emails=emails.addresses
     subject="Welcome to our app"
     html="<h1>Welcome to the app</h1>"
-    message=create_message(recipients=emails,subject=subject,body=html)
-    await mail.send_message(message)
+    send_email.delay(emails,subject,html)
     return{"message":"Email sent successfully"}
 
     
@@ -49,12 +49,12 @@ async def create_user_Account(user_data:UserCreateModel,session:AsyncSession=Dep
     token=create_url_safe_token({"email":email})
     link=f"https://{Config.Domain}/api/v1/auth/verify/{token}"
 
-    html_message=f"""
+    html=f"""
     <h1>Verify your email</h1>
     <p>please click this <a href="{link}">link</a> to verify your mail
     """
-    message=create_message(recipients=[email],subject="Verify your email",body=html_message)
-    await mail.send_message(message)
+    subject="verify your email"
+    send_email.delay([email],subject,html)
     return{
         "message":"Account create! Check mail to verify account",
         "user":new_user,
