@@ -15,10 +15,10 @@ mail_config=ConnectionConfig(
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True,
-    TEMPLATE_FOLDER=Path(Base_Dir,"templates")
+    TEMPLATE_FOLDER=Path(Base_Dir,"templates"),
 )
 
-mail=FastMail(Config=mail_config)
+mail=FastMail(config=mail_config)
 
 def create_message(recipients:list[str],subject:str,body:str):
     message=MessageSchema(

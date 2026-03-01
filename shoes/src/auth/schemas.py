@@ -32,4 +32,7 @@ class UserShoesModel(UserModel):
 class UserLoginModel(BaseModel):
     email:str=Field(max_length=30)
     password:str=Field(min_length=6)
+
+class EmailModel(BaseModel):
+    addresses:List[str]
     
