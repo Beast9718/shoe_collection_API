@@ -9,7 +9,8 @@ from datetime import timedelta,datetime
 from fastapi.responses import JSONResponse
 from .dependencies import RefreshTokenBearer,AccessTokenBearer,get_current_user,RoleChecker
 from src.db.redis import add_jti_to_blocklist
-from src.mail import mail,create_message
+# from src.mail import mail,create_message
+from src.mail import send_email
 from src.config import Config
 # from src.celery_tasks import send_email
 
@@ -45,9 +46,10 @@ async def create_user_Account(user_data:UserCreateModel,bg_tasks:BackgroundTasks
     <p>please click this <a href="{link}">link</a> to verify your mail
     """
     subject="verify your email"
-    message=create_message(recipients=[email],subject=subject,body=html)
-    bg_tasks.add_task(mail.send_message,message)
+    # message=create_message(recipients=[email],subject=subject,body=html)
+    # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay([email],subject,html)
+    bg_tasks.add_task(send_email,[email],subject,html)
     return{
         "message":"Account create! Check mail to verify account",
         "user":new_user,
@@ -129,9 +131,10 @@ async def send_mail(emails:EmailModel,bg_tasks:BackgroundTasks):
     emails=emails.addresses
     subject="Welcome to our app"
     html="<h1>Welcome to the app</h1>"
-    message=create_message(recipients=emails,subject=subject,body=html)
-    bg_tasks.add_task(mail.send_message,message)
+    # message=create_message(recipients=emails,subject=subject,body=html)
+    # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay(emails,subject,html)
+    bg_tasks.add_task(send_email,emails,subject,html)
     return{"message":"Email sent successfully"}
 
 
@@ -173,15 +176,16 @@ async def password_reset_request(email_data:PasswordResetRequestModel,bg_tasks:B
     token=create_url_safe_token({"email":email})
     link=f"https://{Config.Domain}/api/v1/auth/password-reset-confirm/{token}"
 
-    html_message=f"""
+    html=f"""
     <h1>Reset your Password</h1>
     <p>please click this <a href="{link}">link</a> to Reset your Password
     """
     recipients=[email]
     subject="Reset your Password"
-    message=create_message(recipients=recipients,subject=subject,body=html_message)
-    bg_tasks.add_task(mail.send_message,message)
+    # message=create_message(recipients=recipients,subject=subject,body=html_message)
+    # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay(recipients,subject,html_message)
+    bg_tasks.add_task(send_email,recipients,subject,html)
     return JSONResponse(
         content={
             "message":"please check your email for instructions to reset your password"
