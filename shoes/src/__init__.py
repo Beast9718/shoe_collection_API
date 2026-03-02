@@ -21,7 +21,12 @@ app=FastAPI(
     description="a rest api for Shoe collection app",
     
 
-    version= version
+    version= version,
+    docs_url=f"/api/{version}/docs",
+    redoc_url=f"/api/{version}/redoc",
+    contact={
+        "email":"akhileshchy9910@gmail.com"
+    }
 )
 
 register_middleware(app)

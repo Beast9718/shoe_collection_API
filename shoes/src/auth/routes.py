@@ -19,15 +19,6 @@ user_service=UserService()
 REFRESH_EXPIRY_TOKEN=2
 role_checker=Depends(RoleChecker(["admin","user"]))
 
-
-@auth_router.post('/send_mail')
-async def send_mail(emails:EmailModel):
-    emails=emails.addresses
-    subject="Welcome to our app"
-    html="<h1>Welcome to the app</h1>"
-    send_email.delay(emails,subject,html)
-    return{"message":"Email sent successfully"}
-
     
 
 @auth_router.post(
@@ -59,31 +50,6 @@ async def create_user_Account(user_data:UserCreateModel,session:AsyncSession=Dep
         "message":"Account create! Check mail to verify account",
         "user":new_user,
     }
-
-@auth_router.get("/verify/{token}")
-async def verify_user_account(token:str,session:AsyncSession=Depends(get_session)):
-    token_data=decode_url_safe_token(token)
-    user_email=token_data.get('email')
-
-    if user_email:
-        user=await user_service.get_user_by_email(user_email,session)
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
-        await user_service.update_user(user,{"is_verified":True},session)
-
-        return JSONResponse(
-            content={
-                "message":"Account verified successfully"},
-                status_code=status.HTTP_200_OK,
-        )
-    return JSONResponse(
-        content={
-            "message":"ERROR occured during verification"
-        },
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    )
-    
-    
 
 @auth_router.post('/login')
 async def login_user(login_data:UserLoginModel,session:AsyncSession=Depends(get_session)):
@@ -156,6 +122,46 @@ async def revoke_token(token_details:dict=Depends(AccessTokenBearer())):
         status_code=status.HTTP_200_OK
     )
 
+@auth_router.post('/send_mail')
+async def send_mail(emails:EmailModel):
+    emails=emails.addresses
+    subject="Welcome to our app"
+    html="<h1>Welcome to the app</h1>"
+    send_email.delay(emails,subject,html)
+    return{"message":"Email sent successfully"}
+
+
+@auth_router.get("/verify/{token}")
+async def verify_user_account(token:str,session:AsyncSession=Depends(get_session)):
+    token_data=decode_url_safe_token(token)
+    if not token_data:
+        raise HTTPException(
+            status_code=400,
+            detail="invalid or expired token"
+        )
+
+    user_email=token_data.get('email')
+
+    if user_email:
+        user=await user_service.get_user_by_email(user_email,session)
+        if not user:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail="user not found")
+        await user_service.update_user(user,{"is_verified":True},session)
+
+        return JSONResponse(
+            content={
+                "message":"Account verified successfully"},
+                status_code=status.HTTP_200_OK,
+        )
+    return JSONResponse(
+        content={
+            "message":"ERROR occured during verification"
+        },
+        status_code=status.HTTP_400_BAD_REQUEST,
+    )
+    
+    
+
 @auth_router.post("/password-reset-request")
 async def password_reset_request(email_data:PasswordResetRequestModel):
     email=email_data.email
@@ -167,8 +173,9 @@ async def password_reset_request(email_data:PasswordResetRequestModel):
     <h1>Reset your Password</h1>
     <p>please click this <a href="{link}">link</a> to Reset your Password
     """
-    message=create_message(recipients=[email],subject="Reset your Password",body=html_message)
-    await mail.send_message(message)
+    recipients=[email]
+    subject="Reset your Password"
+    send_email.delay(recipients,subject,html_message)
     return JSONResponse(
         content={
             "message":"please check your email for instructions to reset your password"
@@ -185,6 +192,12 @@ async def reset_account_password(token:str,passwords:PasswordResetConfirmModel,s
     
     
     token_data=decode_url_safe_token(token)
+    if not token_data:
+        raise HTTPException(
+            status_code=400,
+            detail="invalid or expired token"
+        )
+    
     user_email=token_data.get('email')
 
     if user_email:
@@ -203,6 +216,6 @@ async def reset_account_password(token:str,passwords:PasswordResetConfirmModel,s
         content={
             "message":"ERROR occured during password reset"
         },
-        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        status_code=status.HTTP_400_BAD_REQUEST,
     )
     
