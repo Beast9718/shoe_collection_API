@@ -49,8 +49,8 @@ async def create_user_Account(user_data:UserCreateModel,bg_tasks:BackgroundTasks
     # message=create_message(recipients=[email],subject=subject,body=html)
     # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay([email],subject,html)
-    # bg_tasks.add_task(send_email,[email],subject,html)
-    send_email([email],subject,html)
+    bg_tasks.add_task(send_email,[email],subject,html)
+    # send_email([email],subject,html)
     return{
         "message":"Account create! Check mail to verify account",
         "user":new_user,
@@ -135,8 +135,8 @@ async def send_mail(emails:EmailModel,bg_tasks:BackgroundTasks):
     # message=create_message(recipients=emails,subject=subject,body=html)
     # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay(emails,subject,html)
-    # bg_tasks.add_task(send_email,emails,subject,html)
-    send_email(emails,subject,html)
+    bg_tasks.add_task(send_email,emails,subject,html)
+    # send_email(emails,subject,html)
     return{"message":"Email sent successfully"}
 
 
@@ -187,8 +187,8 @@ async def password_reset_request(email_data:PasswordResetRequestModel,bg_tasks:B
     # message=create_message(recipients=recipients,subject=subject,body=html_message)
     # bg_tasks.add_task(mail.send_message,message)
     # send_email.delay(recipients,subject,html_message)
-    # bg_tasks.add_task(send_email,recipients,subject,html)
-    send_email(recipients,subject,html)
+    bg_tasks.add_task(send_email,recipients,subject,html)
+    # send_email(recipients,subject,html)
     return JSONResponse(
         content={
             "message":"please check your email for instructions to reset your password"
